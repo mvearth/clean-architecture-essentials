@@ -2,13 +2,11 @@
 
 namespace CleanArchMvc.Domain.Entities
 {
-    public sealed class Category
+    public sealed class Category : Entity
     {
-        public int? Id { get; private set; }
-
         public string Name { get; private set; }
 
-        public Category(string? name)
+        public Category(string name)
         {
             ValidateDomain(null, name);
         }
@@ -26,13 +24,6 @@ namespace CleanArchMvc.Domain.Entities
         {
             ValidateAndSetId(id);
             ValidateAndSetName(name);
-        }
-
-        private void ValidateAndSetId(int? id)
-        {
-            DomainExceptionValidation.When(id < 0, "Invalid Id. Id must be greather than zero");
-
-            Id = id;
         }
 
         private void ValidateAndSetName(string name)
