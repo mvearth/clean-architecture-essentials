@@ -1,61 +1,47 @@
 ﻿using CleanArchMvc.Domain.Validation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanArchMvc.Domain.Entities
 {
     public sealed class Category
     {
-        public int Id { get; private set; }
+        public int? Id { get; private set; }
 
         public string Name { get; private set; }
 
-        public Category(string name)
+        public Category(string? name)
         {
-            SetName(name);
+            ValidateDomain(null, name);
         }
 
-        public Category(int id, string name)
+        public Category(int? id, string name)
         {
-            SetId(id);
-            SetName(name);
+            ValidateDomain(id, name);
         }
 
         public ICollection<Product> Products { get; set; }
 
-        private void SetId(int id)
+        public void UpdateName(string name) => ValidateAndSetName(name);
+
+        private void ValidateDomain(int? id, string name)
         {
-            ValidateId(id);
+            ValidateAndSetId(id);
+            ValidateAndSetName(name);
+        }
+
+        private void ValidateAndSetId(int? id)
+        {
+            DomainExceptionValidation.When(id < 0, "Invalid Id. Id must be greather than zero");
 
             Id = id;
         }
 
-        private void ValidateId(int id)
+        private void ValidateAndSetName(string name)
         {
-            var idIsNegative = id < 0;
+            DomainExceptionValidation.When(string.IsNullOrWhiteSpace(name), "Invalid name. Name is required");
 
-            DomainExceptionValidation.When(idIsNegative, "Invalid Id. Id must be greather than zero");
-        }
-
-        private void SetName(string name)
-        {
-            ValidateName(name);
+            DomainExceptionValidation.When(name.Length <= 3, "Invalid name. Name is too short, minimum 3 chars");
 
             Name = name;
-        }
-
-        private void ValidateName(string name)
-        {
-            var nameIsEmpty = string.IsNullOrWhiteSpace(name);
-
-            DomainExceptionValidation.When(nameIsEmpty, "Invalid name. Name is required");
-
-            var nameIsTooShort = name.Length <= 3;
-
-            DomainExceptionValidation.When(nameIsTooShort, "Invalid name. Name is too short, minimum 3 chars");
         }
     }
 }
